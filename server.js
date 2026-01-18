@@ -2,12 +2,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { Groq } from "groq-sdk";
-import multer from "multer";
-import Tesseract from "tesseract.js";
-const upload = multer({
-  storage: multer.memoryStorage(),
-});
-
 
 dotenv.config();
 
@@ -50,28 +44,6 @@ function extractStartingLetter(text) {
 }
 
 /* ===================== ROUTE ===================== */
-app.post("/ocr", upload.single("image"), async (req, res) => {
-  try {
-    // 1️⃣ Validate
-    if (!req.file) {
-      return res.status(400).json({ error: "No image uploaded" });
-    }
-
-    // 2️⃣ Run OCR
-    const result = await Tesseract.recognize(
-      req.file.buffer,
-      "eng"
-    );
-
-    const text = result.data.text?.trim();
-
-    // 3️⃣ Respond
-    res.json({ text });
-  } catch (err) {
-    console.error("OCR error:", err);
-    res.status(500).json({ error: "OCR failed" });
-  }
-});
 
 app.post("/ask-doubt", async (req, res) => {
   try {
@@ -81,7 +53,8 @@ app.post("/ask-doubt", async (req, res) => {
       return res.status(400).json({ error: "Missing messages" });
     }
 
-    const lastUserMessage = messages[messages.length - 1].content || "";
+    const lastUserMessage =
+      messages[messages.length - 1].content || "";
 
     const completion = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
@@ -106,17 +79,20 @@ app.post("/ask-doubt", async (req, res) => {
     if (wantsWordList(lastUserMessage)) {
       let words = extractWords(answer);
 
-      // Enforce starting letter
       const letter = extractStartingLetter(lastUserMessage);
       if (letter) {
-        words = words.filter((w) => w.toLowerCase().startsWith(letter));
+        words = words.filter((w) =>
+          w.toLowerCase().startsWith(letter)
+        );
       }
 
-      // Remove duplicates (case-insensitive)
-      const unique = [...new Set(words.map((w) => w.toLowerCase()))];
+      const unique = [
+        ...new Set(words.map((w) => w.toLowerCase())),
+      ];
 
-      // Enforce count
-      const requestedCount = extractRequestedCount(lastUserMessage);
+      const requestedCount =
+        extractRequestedCount(lastUserMessage);
+
       let finalWords = unique;
       if (requestedCount) {
         finalWords = unique.slice(0, requestedCount);
@@ -137,4 +113,3 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
-
