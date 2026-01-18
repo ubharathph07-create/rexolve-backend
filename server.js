@@ -50,6 +50,28 @@ function extractStartingLetter(text) {
 }
 
 /* ===================== ROUTE ===================== */
+app.post("/ocr", upload.single("image"), async (req, res) => {
+  try {
+    // 1️⃣ Validate
+    if (!req.file) {
+      return res.status(400).json({ error: "No image uploaded" });
+    }
+
+    // 2️⃣ Run OCR
+    const result = await Tesseract.recognize(
+      req.file.buffer,
+      "eng"
+    );
+
+    const text = result.data.text?.trim();
+
+    // 3️⃣ Respond
+    res.json({ text });
+  } catch (err) {
+    console.error("OCR error:", err);
+    res.status(500).json({ error: "OCR failed" });
+  }
+});
 
 app.post("/ask-doubt", async (req, res) => {
   try {
