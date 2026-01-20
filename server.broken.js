@@ -24,6 +24,11 @@ const PORT = process.env.PORT || 5001;
 
 app.use(cors());
 app.use(express.json());
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+if (!fs.existsSync(path.join(__dirname, "uploads"))) {
+  fs.mkdirSync(path.join(__dirname, "uploads"));
+}
 
 /* =======================
    SQLITE HELPERS
@@ -91,38 +96,6 @@ async function getAIResponse(messages) {
 app.get("/", (req, res) => {
   res.json({ status: "ok", message: "Doubt Solver API running" });
 });
-
-/* =======================
-   ASK DOUBT
-======================= */
-app.post("/ask-doubt", async (req, res) => {
-  try {
-    const { messages } = req.body;
-
-    if (!messages || messages.length === 0) {
-      return res.status(400).json({ error: "Messages required" });
-    }
-
-    const result = await getAIResponse(messages);
-    const { subject, topic, answer, steps, followUpQuestion } =
-      result;
-
-    const timestamp = new Date().toISOString();
-
-    await run(
-      `INSERT INTO Doubts
-       (question_text, answer, steps, subject, topic, timestamp)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        messages[messages.length - 1].content || null,
-        answer,
-        JSON.stringify(steps || []),
-        subject || "General",
-        topic || "General",
-        timestamp,
-      ]
-    );
-
 
 /* =======================
    START SERVER
