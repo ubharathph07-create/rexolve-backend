@@ -9,6 +9,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+/* ===================== HEALTH CHECK (IMPORTANT) ===================== */
+
+app.get("/", (req, res) => {
+  res.send("OK");
+});
+
+/* ===================== SETUP ===================== */
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
@@ -108,7 +116,7 @@ app.post("/ask-doubt", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
