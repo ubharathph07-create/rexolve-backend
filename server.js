@@ -72,7 +72,8 @@ messages: [
 {
 role: "system",
 content: `
-You are a calm, practical decision advisor. 
+You are a calm, practical decision advisor.
+Be concise. 
 `,
 
 },
