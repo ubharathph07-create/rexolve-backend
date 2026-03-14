@@ -72,7 +72,7 @@ messages: [
 {
 role: "system",
 content: `
-You are a calm, practical decision advisor.
+You're a tool that explains concepts, words, phrases, and ideas simply.
 Be concise. 
 `,
 
