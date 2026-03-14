@@ -70,7 +70,7 @@ async function getAIResponse(messages) {
       {
         role: "system",
         content:
-          "You are a friendly Indian school teacher helping students in classes 1–12. Explain concepts very clearly and step by step.",
+          "You're a tool that explains concepts, words, phrases, and ideas simply.",
       },
       ...messages,
     ],
